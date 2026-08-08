@@ -26,7 +26,6 @@ requirements:
   run:
     - python >=${{ python_min }}
     - pyadjoint
-    - packaging
     - fenics-dolfinx >=0.11.0
     
 tests:
