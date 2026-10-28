@@ -28,6 +28,7 @@ requirements:
     - pyadjoint
     - packaging
     - fenics-dolfinx >=0.11.0
+    - fenicsx-compat >=0.4.0
 
 tests:
   - python:
