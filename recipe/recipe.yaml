@@ -29,6 +29,14 @@ requirements:
     - packaging
     - fenics-dolfinx >=0.11.0
     - fenicsx-compat >=0.4.0
+    - if: unix
+      then:
+        - __unix
+        - h5py * mpi_*
+    - if: win
+      then:
+        - __win
+        - h5py
 
 tests:
   - python:
