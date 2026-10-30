@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   python_min: "3.12"
-  version: "0.4.0"
+  version: "0.4.0.post0"
 
 package:
   name: dolfinx-adjoint
@@ -10,7 +10,7 @@ package:
 
 source:
   url: "https://pypi.org/packages/source/d/dolfinx-adjoint/dolfinx_adjoint-${{ version }}.tar.gz"
-  sha256: 82b462070f12cb987c55a789f25953b75daf46d6dc1368d7cc793598261ab8ba
+  sha256: be6e4b618febe10d9cb00c36fe71f2f1bf729f5972ff55e77ceb9f1889e450e1
 
 build:
   number: 0
