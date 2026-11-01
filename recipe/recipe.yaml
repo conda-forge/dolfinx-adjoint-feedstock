@@ -11,6 +11,8 @@ package:
 source:
   url: "https://pypi.org/packages/source/d/dolfinx-adjoint/dolfinx_adjoint-${{ version }}.tar.gz"
   sha256: be6e4b618febe10d9cb00c36fe71f2f1bf729f5972ff55e77ceb9f1889e450e1
+  patches:
+    - 0001-Fix-for-windows-and-add-windows-workflow-using-dolfi.patch
 
 build:
   number: 0
