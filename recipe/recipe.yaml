@@ -11,8 +11,7 @@ package:
 source:
   url: "https://pypi.org/packages/source/d/dolfinx-adjoint/dolfinx_adjoint-${{ version }}.tar.gz"
   sha256: 86cfaeee2b6c3ddde40c2fc899cbdec364218c8e94bede877697bca9d4fa87a2
-  patches:
-    - 0001-Make-PETSc-optional-for-Windows.patch
+
 build:
   number: 0
   noarch: python
