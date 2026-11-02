@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   python_min: "3.12"
-  version: "0.4.0.post0"
+  version: "0.4.1"
 
 package:
   name: dolfinx-adjoint
@@ -10,9 +10,8 @@ package:
 
 source:
   url: "https://pypi.org/packages/source/d/dolfinx-adjoint/dolfinx_adjoint-${{ version }}.tar.gz"
-  sha256: be6e4b618febe10d9cb00c36fe71f2f1bf729f5972ff55e77ceb9f1889e450e1
-  patches:
-    - 0001-Make-PETSc-optional-for-Windows.patch
+  sha256: 86cfaeee2b6c3ddde40c2fc899cbdec364218c8e94bede877697bca9d4fa87a2
+
 build:
   number: 0
   noarch: python
