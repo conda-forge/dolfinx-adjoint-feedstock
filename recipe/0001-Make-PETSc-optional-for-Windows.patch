@@ -1,0 +1,103 @@
+diff --git a/src/dolfinx_adjoint/__init__.py b/src/dolfinx_adjoint/__init__.py
+index d250302..f594469 100644
+--- a/src/dolfinx_adjoint/__init__.py
++++ b/src/dolfinx_adjoint/__init__.py
+@@ -2,6 +2,8 @@
+ 
+ from importlib.metadata import metadata
+ 
++import dolfinx as _dolfinx
++
+ # Start annotation at import
+ import pyadjoint as _pyad
+ 
+@@ -9,9 +11,12 @@ from .assembly import assemble_scalar, error_norm
+ from .checkpointing import enable_disk_checkpointing
+ from .function import assign
+ from .interpolation import interpolate, interpolate_nonmatching
+-from .solvers import LinearProblem, NonlinearProblem
+ from .types import Constant, Function, dirichletbc
+ 
++# The solvers build on dolfinx.fem.petsc, which DOLFINx built without PETSc (e.g. on Windows) lacks.
++if _dolfinx.has_petsc4py:
++    from .solvers import LinearProblem, NonlinearProblem
++
+ meta = metadata("dolfinx_adjoint")
+ __version__ = meta.get("Version")
+ __license__ = meta.get("License")
+@@ -27,8 +32,6 @@ __all__ = [
+     "Constant",
+     "Function",
+     "dirichletbc",
+-    "LinearProblem",
+-    "NonlinearProblem",
+     "assemble_scalar",
+     "assign",
+     "enable_disk_checkpointing",
+@@ -41,3 +44,12 @@ __all__ = [
+     "interpolate",
+     "interpolate_nonmatching",
+ ]
++
++if _dolfinx.has_petsc4py:
++    __all__ += ["LinearProblem", "NonlinearProblem"]
++else:
++
++    def __getattr__(name: str):
++        if name in ("LinearProblem", "NonlinearProblem"):
++            raise ImportError(f"dolfinx_adjoint.{name} requires DOLFINx built with PETSc (petsc4py).")
++        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+diff --git a/src/dolfinx_adjoint/blocks/__init__.py b/src/dolfinx_adjoint/blocks/__init__.py
+index c9ff3ab..6e06fa9 100644
+--- a/src/dolfinx_adjoint/blocks/__init__.py
++++ b/src/dolfinx_adjoint/blocks/__init__.py
+@@ -1,9 +1,10 @@
++import dolfinx
++
+ from .assembly import AssembleBlock
+ from .dirichletbc import DirichletBCBlock
+ from .function_assigner import FunctionAssignBlock
+ from .interpolation import ExprInterpolationBlock, InterpolationBlock
+ from .nonmatching_interpolation import NonmatchingInterpolationBlock
+-from .solvers import LinearProblemBlock, NonlinearProblemBlock
+ 
+ __all__ = [
+     "AssembleBlock",
+@@ -11,7 +12,11 @@ __all__ = [
+     "ExprInterpolationBlock",
+     "FunctionAssignBlock",
+     "InterpolationBlock",
+-    "LinearProblemBlock",
+-    "NonlinearProblemBlock",
+     "NonmatchingInterpolationBlock",
+ ]
++
++# The solver blocks build on dolfinx.fem.petsc, which DOLFINx built without PETSc (e.g. on Windows) lacks.
++if dolfinx.has_petsc4py:
++    from .solvers import LinearProblemBlock, NonlinearProblemBlock
++
++    __all__ += ["LinearProblemBlock", "NonlinearProblemBlock"]
+diff --git a/src/dolfinx_adjoint/blocks/interpolation.py b/src/dolfinx_adjoint/blocks/interpolation.py
+index 7bb525e..fc65962 100644
+--- a/src/dolfinx_adjoint/blocks/interpolation.py
++++ b/src/dolfinx_adjoint/blocks/interpolation.py
+@@ -5,7 +5,6 @@ import weakref
+ from typing import Callable
+ 
+ import dolfinx
+-import dolfinx.fem.petsc
+ import numpy as np
+ import ufl
+ from fenicsx_compat import require_module
+@@ -137,7 +136,10 @@ def _build_interpolation_matrix(
+ ) -> _MatrixCSRWorkspace | "PETSc.Mat":
+     """Assemble the interpolation matrix for a pair of spaces."""
+     if use_petsc:
+-        petsc_mat = dolfinx.fem.petsc.interpolation_matrix(space_from, space_to)
++        # Imported lazily: DOLFINx built without PETSc (e.g. on Windows) has no dolfinx.fem.petsc.
++        from dolfinx.fem.petsc import interpolation_matrix as petsc_interpolation_matrix
++
++        petsc_mat = petsc_interpolation_matrix(space_from, space_to)
+         petsc_mat.assemble()
+         return petsc_mat
+ 
